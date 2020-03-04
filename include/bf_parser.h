@@ -12,13 +12,10 @@ typedef struct bf_parser_input {
 } bf_parser_input;
 
 typedef struct bf_parser {
-    int (* parse)(struct bf_parser *self, bf_parser_input *input);
+    int (* parse)(struct bf_parser *self);
 } bf_parser;
 
-#define bf_parser_input_gen(a) \
-typedef struct bf_parser_input { \
-    void (*put)(struct bf_parser_input *self, #a sym); \
-    void (*get)(struct bf_parser_input *self, #a *sym); \
-} bf_parser_input; \
+int bf_parser_put(bf_parser *self, bf_sym sym);
+int bf_parser_parse(bf_parser *self);
 
 #endif
