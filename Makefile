@@ -7,7 +7,8 @@ INCLUDES=$(wildcard $(INCLUDE_DIR)/*.h)
 
 $(TARGET): $(SRCS)
 	@mkdir -p bin
-	$(CC) $(SRCS) -I$(INCLUDE_DIR) -o bin/$@
+	# $(CC) -DDEBUG -g $(SRCS) -I$(INCLUDE_DIR) -o bin/$@
+	$(CC) -g $(SRCS) -I$(INCLUDE_DIR) -o bin/$@
 
 clean:
 	rm -rf bin/*
