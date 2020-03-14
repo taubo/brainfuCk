@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include "bf_sym.h"
 #include "bf_parser.h"
@@ -130,21 +131,36 @@ typedef struct {
 } bf_tape;
 
 int bracket_cnt = 0;
+int sub_cnt = 0;
 typedef struct {
-    char *open_bracket[10];
-    int cnt;
+    char *open_bracket[20];
+    int cnt[20];
 } loop;
 
 void print_out_tape(simple_bf_interpreter *interpreter)
 {
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < 50; ++i) {
         if (i == interpreter->curr_pos)
-            printf("[ %d ] ", interpreter->bf_output_tape[i]);
+            printf(" [%d] ", interpreter->bf_output_tape[i]);
         else
             printf(" %d ", interpreter->bf_output_tape[i]);
     }
     printf("\n");
 }
+
+void tape_print_untill(char *tape_char, int untill)
+{
+    for (int i = 0; i < untill; ++i) {
+        if (i != untill) {
+            printf("%c", tape_char[i]);
+        } else {
+            printf("[%c]", tape_char[i]);
+        }
+    }
+    printf("\n");
+}
+
+bool execute = true;
 
 int simple_bf_interpreter_run(simple_bf_interpreter *self, bf_tape *program_tape)
 {
@@ -152,61 +168,85 @@ int simple_bf_interpreter_run(simple_bf_interpreter *self, bf_tape *program_tape
     int cnt = 0;
     loop _loop;
 
-    while (cnt != _size) {
-        dbg("tape char: %c => ", program_tape->tape[cnt]);
+    dbg("_size: %d\n", _size);
+    while (cnt <= _size) {
+        dbg("cnt: %d\n", cnt);
+        dbg("bracket_cnt: %d\n", bracket_cnt);
+        // dbg("tape char: %c => ", program_tape->tape[cnt]);
+        if (execute) {
+            switch (program_tape->tape[cnt]) {
+                case '+':
+                    bf_incr_data(self);
+                    break;
+                case '-':
+                    bf_decr_data(self);
+                    break;
+                case '>':
+                    bf_incr_ptr(self);
+                    break;
+                case '<':
+                    bf_decr_ptr(self);
+                    break;
+                case '.':
+                    bf_output(self);
+                    break;
+                case ',':
+                    bf_input(self);
+                    break;
+                default:
+                    break;
+            }
+        } else {
+
+        }
         switch (program_tape->tape[cnt]) {
-            case '+':
-                bf_incr_data(self);
-                break;
-            case '-':
-                bf_decr_data(self);
-                break;
-            case '>':
-                bf_incr_ptr(self);
-                break;
-            case '<':
-                bf_decr_ptr(self);
-                break;
-            case '.':
-                bf_output(self);
-                break;
-            case ',':
-                bf_input(self);
-                break;
             case '[':
                 {
                     _loop.open_bracket[bracket_cnt] = &program_tape->tape[cnt + 1];
-                    _loop.cnt = cnt;
+                    _loop.cnt[bracket_cnt] = cnt;
                     // printf("%c\n", *(_loop.open_bracket[bracket_cnt]));
                     bracket_cnt++;
-                    if (self->bf_output_tape[self->curr_pos] != 0) {
-                        // continue;
-                    } else {
+                    if (!execute)
+                        sub_cnt++;
+                    if (self->bf_output_tape[self->curr_pos] == 0) {
                         // jmp forward
-                        dbg("cnt: %d\n", cnt);
-                        dbg("_size: %d\n", _size);
-                        while (cnt < _size) {
-                            dbg("next: %c\n", program_tape->tape[cnt + 1]);
-                            if (program_tape->tape[cnt + 1] != ']')
-                                cnt++;
-                            else
-                                break;
-                        }
-                        if (cnt == _size)
-                            return -1;
+                        // dbg("cnt: %d\n", cnt);
+                        // dbg("_size: %d\n", _size);
+                        execute = false;
+
+                        // while (cnt < _size) {
+                        //     tape_print_untill(program_tape->tape, cnt);
+                        //     // dbg("next: %c\n", program_tape->tape[cnt + 1]);
+                        //     if (program_tape->tape[cnt + 1] != ']')
+                        //         cnt++;
+                        //     else
+                        //         break;
+                        // }
+                        // if (cnt == _size)
+                        //     return -1;
+
                     }
                 }
                 break;
             case ']':
+                if (sub_cnt == 0)
+                    execute = true;
+                if (!execute)
+                    sub_cnt--;
                 if (self->bf_output_tape[self->curr_pos] != 0) {
                     // jmp backward
-                    cnt = _loop.cnt;
+                    if (bracket_cnt > 0)
+                        cnt = _loop.cnt[bracket_cnt - 1];
+                    dbg("cnt: %d\n", cnt);
                 } else {
                     if (bracket_cnt > 0) {
                         bracket_cnt--;
-                    } else {
-                        return -1;
                     }
+                    /*
+                       else {
+                       return -2;
+                       }
+                       */
                 }
                 break;
             default:
@@ -214,13 +254,17 @@ int simple_bf_interpreter_run(simple_bf_interpreter *self, bf_tape *program_tape
         }
         cnt++;
 #ifdef DEBUG
+        tape_print_untill(program_tape->tape, cnt);
+#endif
+#ifdef DEBUG
         print_out_tape(self);
 #endif
     }
 
-
-    if (_loop.cnt > 0)
-        return -1;
+    // if (_loop.cnt > 0)
+    //     return -3;
+    //
+    return 0;
 }
 
 #define MAX_BF_PROGRAM  65536
@@ -255,6 +299,7 @@ int main(int argc, char **argv)
         input_tape.size++;
         input_tape.tape[input_tape.size] = bf_character;
     }
+    // printf("ret: %d\n", simple_bf_interpreter_run(&interpreter, &input_tape));
     simple_bf_interpreter_run(&interpreter, &input_tape);
 
     return 0;
