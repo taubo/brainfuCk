@@ -213,18 +213,6 @@ int simple_bf_interpreter_run(simple_bf_interpreter *self, bf_tape *program_tape
                         // dbg("cnt: %d\n", cnt);
                         // dbg("_size: %d\n", _size);
                         execute = false;
-
-                        // while (cnt < _size) {
-                        //     tape_print_untill(program_tape->tape, cnt);
-                        //     // dbg("next: %c\n", program_tape->tape[cnt + 1]);
-                        //     if (program_tape->tape[cnt + 1] != ']')
-                        //         cnt++;
-                        //     else
-                        //         break;
-                        // }
-                        // if (cnt == _size)
-                        //     return -1;
-
                     }
                 }
                 break;
