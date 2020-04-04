@@ -196,8 +196,6 @@ int simple_bf_interpreter_run(simple_bf_interpreter *self, bf_tape *program_tape
                 default:
                     break;
             }
-        } else {
-
         }
         switch (program_tape->tape[cnt]) {
             case '[':
