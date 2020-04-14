@@ -9,35 +9,27 @@ typedef struct {
 
 int main(void)
 {
-	ss_elem elem;
-	ss_elem peek;
-
-	if ((elem.data = malloc(sizeof(test_struct))) == NULL) {
-		printf("allocation error\n");
-
-		return -1;
-	}
-
-	test_struct *data = elem.data;
-	data->id = 5;
-	data->position = 0;
+	test_struct elem;
+	test_struct peek;
+	test_struct pop;
 
 	sstack *stack;
-	if ((stack = sstack_new(10)) == NULL) {
+	if ((stack = sstack_new(10, sizeof(test_struct))) == NULL) {
 		printf("allocation error\n");
 	}
-	sstack_push(stack, &elem);
-	data->id = 6;
-	sstack_push(stack, &elem);
 	for (int i = 0; i < 10; ++i) {
+        elem.id = rand();
+        elem.position = i;
 		if (sstack_push(stack, &elem) < 0) {
 			printf("error trying to allocate element #%d\n", i);
 		}
+        sstack_peek(stack, &peek);
+        printf("peek: id: %d - position: %d\n", peek.id, peek.position);
 	}
-	sstack_peek(stack, &peek);
 
-	test_struct *peek_data = peek.data;
-	printf("id: %d - position: %d\n", peek_data->id, peek_data->position);
+    while (sstack_pop(stack, &pop) == 0) {
+        printf("pop: id: %d - position: %d\n", pop.id, pop.position);
+    }
 
 	return 0;
 }
