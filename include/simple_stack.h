@@ -1,27 +1,29 @@
 #ifndef SIMPLE_STACK_H
 #define SIMPLE_STACK_H
 
+#include <stdlib.h>
+
 typedef struct {
 	void *data;
 	size_t size;
-} data;
+} ss_data;
 
 typedef struct {
-	// data *data;
-	void *data;
-	struct ss_elem *prev;
+	ss_data *data;
 } ss_elem;
 
 typedef struct {
 	int size;
-	int capacity;
-	ss_elem *elems;
-	ss_elem *peek_elem;
+	size_t capacity;
+	size_t elem_size;
+	void *elems;
+	void *peek_elem;
 } sstack;
 
-sstack *sstack_new(size_t capacity);
-int sstack_push(sstack *self, ss_elem *elem);
-int sstack_pop(sstack *self, ss_elem *elem);
-int sstack_peek(sstack *self, ss_elem *elem);
+sstack *sstack_new(size_t capacity, size_t elem_size);
+void sstack_delete(sstack *self);
+int sstack_push(sstack *self, void *elem);
+int sstack_pop(sstack *self, void *elem);
+int sstack_peek(sstack *self, void *elem);
 
 #endif

@@ -24,9 +24,9 @@ static int is_empty(sstack *self)
 	return 0;
 }
 
-sstack *sstack_new(size_t capacity)
+sstack *sstack_new(size_t capacity, size_t elem_size)
 {
-	ss_elem *elems;
+	void *elems;
 	sstack *self = NULL;
 
 	if (capacity <= 0)
@@ -37,10 +37,11 @@ sstack *sstack_new(size_t capacity)
 	}
 
 	self->capacity = capacity;
+    self->elem_size = elem_size;
 	self->size = 0;
 	self->peek_elem = NULL;
 
-	if ((elems = calloc((size_t)capacity, sizeof(ss_elem))) == NULL) {
+	if ((elems = calloc((size_t)capacity, elem_size)) == NULL) {
 		goto dealloc;
 	}
 
@@ -54,40 +55,40 @@ dealloc:
 	return NULL;
 }
 
-int sstack_push(sstack *self, ss_elem *elem)
+int sstack_push(sstack *self, void *elem)
 {
 	if (is_full(self)) {
 		return -1;
 	}
 
-	memcpy(self->elems + self->size, elem, sizeof(ss_elem));
-	self->peek_elem = self->elems + self->size;
+	memcpy(self->elems + (self->size * self->elem_size), elem, self->elem_size);
 
+	self->peek_elem = self->elems + (self->size * self->elem_size);
 	self->size++;
 
 	return 0;
 }
 
-int sstack_pop(sstack *self, ss_elem *elem)
+int sstack_pop(sstack *self, void *elem)
 {
 	if (is_empty(self)) {
 		return -1;
 	}
 
-	self->peek_elem.data = NULL;
-
 	self->size--;
+    self->peek_elem = self->elems + (self->size * self->elem_size);
+    memcpy(elem, self->peek_elem, self->elem_size);
 
 	return 0;
 }
 
-int sstack_peek(sstack *self, ss_elem *elem)
+int sstack_peek(sstack *self, void *elem)
 {
 	if (is_empty(self)) {
 		return -1;
 	}
 
-	memcpy(elem, self->peek_elem, sizeof(ss_elem));
+	memcpy(elem, self->peek_elem, self->elem_size);
 
 	return 0;
 }
