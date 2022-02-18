@@ -5,10 +5,12 @@ INCLUDE_DIR=include
 SRCS=$(wildcard $(SRC_DIR)/*.c)
 INCLUDES=$(wildcard $(INCLUDE_DIR)/*.h)
 
-$(TARGET): $(SRCS)
+SRCS_BF=src/main.c
+
+$(TARGET): $(SRCS_BF)
 	@mkdir -p bin
-	$(CC) -DDEBUG -g $(SRCS) -I$(INCLUDE_DIR) -o bin/$@-debug
-	$(CC) -O3 $(SRCS) -I$(INCLUDE_DIR) -o bin/$@
+	$(CC) -DDEBUG -g $(SRCS_BF) -I$(INCLUDE_DIR) -o bin/$@-debug
+	$(CC) -O3 $(SRCS_BF) -I$(INCLUDE_DIR) -o bin/$@
 
 par_matching_test: src/par_matching.c src/simple_stack.c
 	$(CC) $^ -I$(INCLUDE_DIR) -o bin/$@
