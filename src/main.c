@@ -285,6 +285,7 @@ int main(int argc, char **argv)
         input_tape.size++;
         input_tape.tape[input_tape.size] = bf_character;
     }
+
     // printf("ret: %d\n", simple_bf_interpreter_run(&interpreter, &input_tape));
     simple_bf_interpreter_run(&interpreter, &input_tape);
 
