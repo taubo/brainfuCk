@@ -1,1 +1,2 @@
-[] add Makefile to apps and tests directories
+[] add Makefile to apps and tests directories;
+[] fix build system to allow debug/release builds (now is messy);
