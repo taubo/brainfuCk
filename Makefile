@@ -15,17 +15,17 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) -c $^ -o $@ -I$(INCLUDE_DIR)
 
 $(TARGET): prepare $(OBJS)
-	$(CC) -DDEBUG -g $(OBJS) -I$(INCLUDE_DIR) -o bin/$@-debug
-	$(CC) -O3 $(OBJS) -I$(INCLUDE_DIR) -o bin/$@
+	# $(CC) -DDEBUG -g $(OBJS) -I$(INCLUDE_DIR) -o bin/$@-debug
+	$(CC) $(OBJS) -I$(INCLUDE_DIR) -o bin/$@
 
 prepare:
 	mkdir -p bin
 	mkdir -p build
 
-par_matching_test: src/par_matching.c src/simple_stack.c
+par_matching_test: tests/par_matching.c test/simple_stack.c
 	$(CC) $^ -I$(INCLUDE_DIR) -o bin/$@
 
-SRCS_STACK=src/simple_stack.c src/simple_stack_app.c
+SRCS_STACK=apps/simple_stack.c apps/simple_stack_app.c
 
 simple_stack_app: $(SRCS_STACK)
 	$(CC) $(SRCS_STACK) -g -Wall -I$(INCLUDE_DIR) -o bin/$@
