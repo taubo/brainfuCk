@@ -8,18 +8,14 @@ typedef struct {
 
 } simple_bf_interpreter_t;
 
-static void simple_bf_interpreter_run(bf_interpreter_t *self, char *program, bf_error_t *error)
+static int syntactic_check(char *program)
 {
-    printf("simple_bf_interpreter_run\n");
-
-    error->error_code = 0;
-
-    simple_bf_interpreter_t *inter = self->interpreter_p_data;
+    int ret = 0;
 
     sstack *parentheses_stack = sstack_new(100, sizeof(char));
     if (!parentheses_stack) {
-        error->error_code = -1;
-        return;
+        /* error->error_code = -1; */
+        return -1;
     }
 
     int i = 0;
@@ -29,11 +25,13 @@ static void simple_bf_interpreter_run(bf_interpreter_t *self, char *program, bf_
         if (symbol == '[') {
             /* log_debug("["); */
             if (sstack_push(parentheses_stack, &symbol) != 0) {
+                ret = -1;
                 goto exit_err;
             }
         } else if (symbol == ']') {
             /* log_debug("]"); */
             if (sstack_pop(parentheses_stack, &elem) != 0) {
+                ret = -1;
                 goto exit_err;
             }
         }
@@ -41,15 +39,34 @@ static void simple_bf_interpreter_run(bf_interpreter_t *self, char *program, bf_
     }
     if (sstack_pop(parentheses_stack, &elem) == 0) {
         /* log_debug("elem: %c", elem); */
+        ret = -1;
         goto exit_err;
     }
 
     goto exit_ok;
 
 exit_err:
-    error->error_code = -1;
+    /* error->error_code = -1; */
+
 exit_ok:
     free(parentheses_stack);
+
+    return ret;
+}
+
+static void simple_bf_interpreter_run(bf_interpreter_t *self, char *program, bf_error_t *error)
+{
+    printf("simple_bf_interpreter_run\n");
+
+    error->error_code = 0;
+
+    simple_bf_interpreter_t *inter = self->interpreter_p_data;
+
+    if (syntactic_check(program) != 0) {
+        error->error_code = -1;
+
+        return;
+    }
 }
 
 int simple_bf_interpreter_new(bf_interpreter_t *interpreter)
