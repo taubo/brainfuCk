@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include "brainfuCk.h"
 
+#include "log.h"
+#include <string.h>
+
 /* interpreters */
 #include "simple_bf_interpreter.h"
 
@@ -21,6 +24,7 @@ void read_program(char *dst, FILE *program_filename)
     while ((character = fgetc(program_filename)) != EOF) {
         dst[i++] = character;
     }
+    dst[i] = '\0';
 }
 
 int main(int argc, char **argv)
@@ -43,10 +47,15 @@ int main(int argc, char **argv)
     input_program = malloc(file_size);
     read_program(input_program, input_file);
 
+    log_info("file_size: %d\n", file_size);
+    log_info("input_program size: %d\n", strlen(input_program));
+
+    bf_error_t error;
     bf_interpreter_t interpreter;
     simple_bf_interpreter_new(&interpreter);
 
-    interpreter.run(&interpreter, input_program);
+    interpreter.run(&interpreter, input_program, &error);
+    log_info("error: %d", error.error_code);
 
     free(input_program);
     fclose(input_file);
