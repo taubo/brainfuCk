@@ -47,12 +47,14 @@ int main(int argc, char **argv)
     input_program = malloc(file_size);
     read_program(input_program, input_file);
 
+    log_set_quiet(1);
     log_info("file_size: %d\n", file_size);
     log_info("input_program size: %d\n", strlen(input_program));
 
     bf_error_t error;
     bf_interpreter_t interpreter;
-    simple_bf_interpreter_new(&interpreter);
+    int err = simple_bf_interpreter_new(&interpreter);
+    log_info("err: %d\n", err);
 
     interpreter.run(&interpreter, input_program, &error);
     log_info("error: %d", error.error_code);

@@ -55,6 +55,11 @@ dealloc:
 	return NULL;
 }
 
+void sstack_to_array(sstack *self, void *array)
+{
+    memcpy(array, self->elems, self->size * self->elem_size);
+}
+
 int sstack_push(sstack *self, void *elem)
 {
 	if (is_full(self)) {

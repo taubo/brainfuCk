@@ -22,6 +22,7 @@ typedef struct {
 
 sstack *sstack_new(size_t capacity, size_t elem_size);
 void sstack_delete(sstack *self);
+void sstack_to_array(sstack *self, void *array);
 int sstack_push(sstack *self, void *elem);
 int sstack_pop(sstack *self, void *elem);
 int sstack_peek(sstack *self, void *elem);
